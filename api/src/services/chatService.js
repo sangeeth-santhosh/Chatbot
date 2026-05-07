@@ -114,7 +114,7 @@ export async function joinChat(roomId, userId) {
         },
       },
     ],
-    { new: true },
+    { new: true, updatePipeline: true },
   ).populate(chatPopulate);
 
   if (!chat) {
@@ -145,7 +145,7 @@ export async function leaveChat(roomId, userId) {
         },
       },
     ],
-    { new: true },
+    { new: true, updatePipeline: true },
   ).populate(chatPopulate);
 
   if (!chat) return null;
