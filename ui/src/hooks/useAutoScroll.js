@@ -4,8 +4,8 @@ export function useAutoScroll() {
   const ref = useRef(null);
 
   useEffect(() => {
-    ref.current?.scrollIntoView({ block: 'end' });
-  });
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, []);
 
   return ref;
 }

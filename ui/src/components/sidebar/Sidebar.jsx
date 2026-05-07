@@ -56,7 +56,8 @@ export function Sidebar() {
             <p className="truncate text-xs text-slate-400">{user?.email}</p>
           </div>
           <button
-            className="rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800"
+            aria-label="Logout"
+            className="rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 focus:ring-offset-[#0f1623] transition disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={logout}
             type="button"
           >
@@ -65,7 +66,13 @@ export function Sidebar() {
         </div>
 
         <div className="mt-4 flex items-center gap-2 text-xs text-slate-400">
-          <span className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+          <span
+            className={`h-3 w-3 rounded-full transition ${
+              connected ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'
+            }`}
+            aria-label={connected ? 'Connected' : 'Connecting...'}
+            role="status"
+          />
           {connected ? 'Realtime connected' : 'Connecting'}
         </div>
       </div>
@@ -76,9 +83,14 @@ export function Sidebar() {
       </div>
 
       {error && (
-        <div className="mx-4 mb-3 rounded-md border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-100">
+        <div className="mx-4 mb-3 rounded-md border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-100" role="alert">
           <div>{getErrorMessage(error)}</div>
-          <button className="mt-2 text-red-200" onClick={() => setError(null)} type="button">
+          <button
+            aria-label="Dismiss error"
+            className="mt-2 text-red-200 hover:text-red-100 focus:outline-none focus:underline transition"
+            onClick={() => setError(null)}
+            type="button"
+          >
             Dismiss
           </button>
         </div>
@@ -97,35 +109,39 @@ export function Sidebar() {
           {sortedChats.map((chat) => {
             const active = chat.id === activeRoomId;
             const disabled = chat.status === 'occupied' && !chat.participants.some((item) => item.id === user?.id);
+            const participantsText = chat.participants.map((item) => item.name).join(', ') || 'No participants';
 
             return (
               <button
-                className={`w-full rounded-md px-3 py-3 text-left transition ${
+                aria-label={`${active ? 'Current room:' : ''} ${chat.prompt}${disabled ? ' (Occupied)' : ''}`}
+                className={`w-full rounded-md px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 focus:ring-offset-[#0f1623] ${
                   active
                     ? 'bg-slate-800 text-white'
                     : disabled
-                      ? 'text-slate-500'
+                      ? 'text-slate-500 cursor-not-allowed'
                       : 'text-slate-300 hover:bg-slate-900'
                 }`}
                 disabled={disabled}
                 key={chat.id}
                 onClick={() => selectChat(chat)}
+                title={chat.prompt}
                 type="button"
               >
                 <div className="flex items-center justify-between gap-3">
                   <p className="truncate text-sm font-medium">{chat.prompt}</p>
                   <span
-                    className={`shrink-0 rounded-full px-2 py-1 text-[11px] ${
+                    className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
                       chat.status === 'available'
                         ? 'bg-emerald-500/10 text-emerald-300'
                         : 'bg-amber-500/10 text-amber-300'
                     }`}
+                    aria-label={`Status: ${chat.status}`}
                   >
                     {chat.status}
                   </span>
                 </div>
-                <p className="mt-2 truncate text-xs text-slate-500">
-                  {chat.participants.map((item) => item.name).join(', ') || 'No participants'}
+                <p className="mt-2 truncate text-xs text-slate-500" title={participantsText}>
+                  {participantsText}
                 </p>
               </button>
             );

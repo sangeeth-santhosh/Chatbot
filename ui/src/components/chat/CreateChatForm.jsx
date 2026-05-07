@@ -42,7 +42,8 @@ export function CreateChatForm() {
     <form className="border-b border-slate-800 bg-[#0b0f19] p-4" onSubmit={submit}>
       <div className="mx-auto flex max-w-4xl flex-col gap-3 sm:flex-row">
         <input
-          className="min-h-11 flex-1 rounded-md border border-slate-700 bg-[#111827] px-4 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400"
+          aria-label="Chat room prompt"
+          className="min-h-11 flex-1 rounded-md border border-slate-700 bg-[#111827] px-4 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!connected || loading}
           maxLength={500}
           onChange={(event) => setPrompt(event.target.value)}
@@ -50,7 +51,8 @@ export function CreateChatForm() {
           value={prompt}
         />
         <button
-          className="h-11 rounded-md bg-emerald-500 px-5 text-sm font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+          aria-label={loading ? 'Creating room' : 'Create room'}
+          className="h-11 rounded-md bg-emerald-500 px-5 text-sm font-medium text-slate-950 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#0b0f19] disabled:opacity-50 disabled:cursor-not-allowed transition"
           disabled={!connected || loading || !prompt.trim()}
           type="submit"
         >

@@ -46,13 +46,14 @@ export function MessageInput({ chat }) {
       window.clearTimeout(typingTimer.current);
       stopTyping();
     };
-  });
+  }, []);
 
   return (
     <form className="border-t border-slate-800 bg-[#0b0f19] p-4" onSubmit={submit}>
       <div className="mx-auto flex max-w-4xl gap-3">
         <textarea
-          className="max-h-36 min-h-12 flex-1 resize-none rounded-md border border-slate-700 bg-[#111827] px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400"
+          aria-label="Message input"
+          className="max-h-36 min-h-12 flex-1 resize-none rounded-md border border-slate-700 bg-[#111827] px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!chat || !connected}
           maxLength={2000}
           onChange={updateText}
@@ -66,7 +67,8 @@ export function MessageInput({ chat }) {
           value={text}
         />
         <button
-          className="h-12 rounded-md bg-slate-100 px-5 text-sm font-medium text-slate-950 hover:bg-white disabled:opacity-60"
+          aria-label="Send message"
+          className="h-12 rounded-md bg-slate-100 px-5 text-sm font-medium text-slate-950 hover:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#0b0f19] disabled:opacity-50 disabled:cursor-not-allowed transition"
           disabled={!chat || !connected || !text.trim()}
           type="submit"
         >

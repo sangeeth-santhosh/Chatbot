@@ -33,7 +33,8 @@ export function MobileRoomBar() {
   return (
     <div className="border-b border-slate-800 bg-[#0f1623] p-3 md:hidden">
       <select
-        className="w-full rounded-md border border-slate-700 bg-[#111827] px-3 py-3 text-sm text-slate-100"
+        aria-label="Select a room"
+        className="w-full rounded-md border border-slate-700 bg-[#111827] px-3 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 focus:ring-offset-[#0f1623]"
         onChange={selectRoom}
         value={activeRoomId || ''}
       >
