@@ -22,7 +22,15 @@ Production-oriented Express, MongoDB, JWT, and Socket.IO backend for the real-ti
    npm run dev
    ```
 
-The API runs on `http://localhost:5000`.
+The API runs locally on `http://localhost:5000`.
+
+Production service:
+
+```text
+https://chatbot-api-sangeeth-santhosh.onrender.com
+```
+
+For Render, use the root `render.yaml` Blueprint and provide `MONGO_URI` when prompted.
 
 ## Endpoints
 

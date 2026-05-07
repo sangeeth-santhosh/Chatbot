@@ -35,7 +35,13 @@ Start the API:
 npm run dev
 ```
 
-The backend runs on `http://localhost:5000`.
+The backend runs locally on `http://localhost:5000`.
+
+Production API URL:
+
+```text
+https://chatbot-api-sangeeth-santhosh.onrender.com
+```
 
 ## Frontend
 
@@ -86,6 +92,16 @@ CLIENT_URL=http://localhost:5173
 Optional frontend overrides:
 
 ```bash
-VITE_API_URL=http://localhost:5000/api
-VITE_SOCKET_URL=http://localhost:5000
+VITE_API_URL=https://chatbot-api-sangeeth-santhosh.onrender.com/api
+VITE_SOCKET_URL=https://chatbot-api-sangeeth-santhosh.onrender.com
 ```
+
+## Render Backend Deployment
+
+The root `render.yaml` defines the production backend service. Create a Render Blueprint from this repository and provide:
+
+```text
+MONGO_URI=your_mongodb_connection_string
+```
+
+Render generates `JWT_SECRET` automatically and deploys the API from `api/`.

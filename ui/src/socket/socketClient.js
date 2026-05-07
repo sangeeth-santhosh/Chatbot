@@ -3,6 +3,8 @@ import { useChatStore } from '../store/chatStore.js';
 import { useSocketStore } from '../store/socketStore.js';
 
 let socket;
+const productionSocketUrl = 'https://chatbot-api-sangeeth-santhosh.onrender.com';
+const developmentSocketUrl = 'http://localhost:5000';
 
 export function getSocket() {
   return socket;
@@ -21,13 +23,17 @@ export function connectSocket(token) {
   const socketStore = useSocketStore.getState();
   socketStore.setConnecting(true);
 
-  socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
-    auth: { token },
-    transports: ['websocket', 'polling'],
-    reconnection: true,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 700,
-  });
+  socket = io(
+    import.meta.env.VITE_SOCKET_URL ||
+      (import.meta.env.PROD ? productionSocketUrl : developmentSocketUrl),
+    {
+      auth: { token },
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 700,
+    },
+  );
 
   socketStore.setSocket(socket);
   bindSocketEvents(socket);

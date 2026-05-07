@@ -14,8 +14,8 @@ The UI runs on `http://localhost:5173`.
 ## Optional Environment
 
 ```bash
-VITE_API_URL=http://localhost:5000/api
-VITE_SOCKET_URL=http://localhost:5000
+VITE_API_URL=https://chatbot-api-sangeeth-santhosh.onrender.com/api
+VITE_SOCKET_URL=https://chatbot-api-sangeeth-santhosh.onrender.com
 ```
 
 ## Scripts
