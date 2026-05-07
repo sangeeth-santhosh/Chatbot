@@ -1,6 +1,6 @@
 # Chat UI
 
-React, Vite, Tailwind CSS, Zustand, Axios, React Router, and Socket.IO client for the realtime chat platform.
+Local React, Vite, Tailwind CSS, Zustand, Axios, React Router, and Socket.IO client for the realtime chat platform.
 
 ## Setup
 
@@ -9,13 +9,16 @@ npm install
 npm run dev
 ```
 
-The UI runs on `http://localhost:5173`.
+The UI runs only on:
 
-## Optional Environment
+```text
+http://localhost:5173
+```
 
-```bash
-VITE_API_URL=https://chatbot-api-sangeeth-santhosh.onrender.com/api
-VITE_SOCKET_URL=https://chatbot-api-sangeeth-santhosh.onrender.com
+The UI calls the backend at:
+
+```text
+http://localhost:5000
 ```
 
 ## Scripts

@@ -9,7 +9,7 @@ import { registerChatSocket } from './socket/chatSocket.js';
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: env.clientUrls,
+    origin: env.clientUrl,
     credentials: true,
   },
 });
@@ -22,7 +22,7 @@ async function start() {
   await connectDatabase();
 
   server.listen(env.port, () => {
-    console.log(`API listening on port ${env.port}`);
+    console.log(`API listening on http://localhost:${env.port}`);
   });
 }
 

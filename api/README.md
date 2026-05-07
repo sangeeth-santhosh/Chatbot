@@ -1,36 +1,32 @@
 # Chat API
 
-Production-oriented Express, MongoDB, JWT, and Socket.IO backend for the real-time chat platform.
+Local Express, MongoDB, JWT, and Socket.IO backend for the real-time chat platform.
 
 ## Setup
 
-1. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Update `.env`:
-
-   ```bash
-   MONGO_URI=your_mongodb_connection_string
-   ```
-
-3. Start the API:
-
-   ```bash
-   npm run dev
-   ```
-
-The API runs locally on `http://localhost:5000`.
-
-Production service:
-
-```text
-https://chatbot-api-sangeeth-santhosh.onrender.com
+```bash
+npm install
+npm run dev
 ```
 
-For Render, use the root `render.yaml` Blueprint and provide `MONGO_URI` when prompted.
+The API runs only on:
+
+```text
+http://localhost:5000
+```
+
+## Environment
+
+Create `api/.env` from `.env.example`:
+
+```bash
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb://127.0.0.1:27017/chatbot
+JWT_SECRET=change_this_to_a_long_random_secret
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:5173
+```
 
 ## Endpoints
 
