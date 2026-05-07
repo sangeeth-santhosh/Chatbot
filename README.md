@@ -47,6 +47,17 @@ npm run dev
 
 The frontend runs on `http://localhost:5173`.
 
+## GitHub Pages
+
+The production frontend is built from `ui/` into the root `docs/` folder.
+Configure GitHub Pages to deploy from `main` branch and `/docs` folder.
+
+Live URL:
+
+```text
+https://sangeeth-santhosh.github.io/Chatbot/
+```
+
 ## Features
 
 - Email-only login and registration
