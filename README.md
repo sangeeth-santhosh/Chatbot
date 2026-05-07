@@ -1,0 +1,80 @@
+# MERN Real-Time Human Chat
+
+A production-oriented MERN chat platform with JWT authentication, MongoDB persistence, Express APIs, and Socket.IO realtime rooms.
+
+## Structure
+
+```text
+root/
+├── api/
+├── ui/
+└── README.md
+```
+
+## Requirements
+
+- Node.js 20+
+- MongoDB connection string
+
+## Backend
+
+```bash
+cd api
+npm install
+```
+
+Set the MongoDB URI in `api/.env`:
+
+```bash
+MONGO_URI=your_mongodb_connection_string
+```
+
+Start the API:
+
+```bash
+npm run dev
+```
+
+The backend runs on `http://localhost:5000`.
+
+## Frontend
+
+```bash
+cd ui
+npm install
+npm run dev
+```
+
+The frontend runs on `http://localhost:5173`.
+
+## Features
+
+- Email-only login and registration
+- JWT protected routes and APIs
+- Persistent auth state on refresh
+- Realtime chat room creation
+- Atomic room joins to prevent more than two participants
+- Available and occupied room status sync
+- Realtime messages, participant names, and typing indicators
+- Disconnect cleanup for occupied rooms
+- Helmet, CORS, rate limiting, validation, and centralized API errors
+
+## Environment
+
+Backend configuration lives in `api/.env`.
+
+```bash
+PORT=5000
+NODE_ENV=development
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=local_chat_platform_jwt_secret_8f3f6c5a0b2d49d4
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:5173
+```
+
+Optional frontend overrides:
+
+```bash
+VITE_API_URL=http://localhost:5000/api
+VITE_SOCKET_URL=http://localhost:5000
+```
