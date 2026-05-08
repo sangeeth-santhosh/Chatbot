@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore.js';
 import { useChatStore } from '../../store/chatStore.js';
 import { useSocketStore } from '../../store/socketStore.js';
@@ -17,8 +17,6 @@ export function Sidebar() {
   const clearTypingRoom = useSocketStore((state) => state.clearTypingRoom);
   const setActiveRoom = useChatStore((state) => state.setActiveRoom);
   const setMessages = useChatStore((state) => state.setMessages);
-
-  const sortedChats = useMemo(() => chats, [chats]);
 
   const selectChat = (chat) => {
     if (!socket || activeRoomId === chat.id) return;
@@ -99,14 +97,14 @@ export function Sidebar() {
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
         {loadingChats && <p className="px-2 py-3 text-sm text-slate-400">Loading rooms...</p>}
 
-        {!loadingChats && sortedChats.length === 0 && (
+        {!loadingChats && chats.length === 0 && (
           <p className="px-2 py-3 text-sm leading-6 text-slate-500">
             No rooms yet. Create one from the prompt input.
           </p>
         )}
 
         <div className="space-y-1">
-          {sortedChats.map((chat) => {
+          {chats.map((chat) => {
             const active = chat.id === activeRoomId;
             const disabled = chat.status === 'occupied' && !chat.participants.some((item) => item.id === user?.id);
             const participantsText = chat.participants.map((item) => item.name).join(', ') || 'No participants';

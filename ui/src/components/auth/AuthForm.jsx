@@ -55,8 +55,9 @@ export function AuthForm({ mode }) {
             <label className="block">
               <span className="text-sm text-slate-300">Name</span>
               <input
-                className="mt-2 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-3 text-slate-100 outline-none focus:border-emerald-400"
+                className="mt-2 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-3 text-slate-100 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 name="name"
+                aria-label="Full name"
                 value={form.name}
                 onChange={updateField}
                 minLength={2}
@@ -70,8 +71,9 @@ export function AuthForm({ mode }) {
           <label className="block">
             <span className="text-sm text-slate-300">Email</span>
             <input
-              className="mt-2 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-3 text-slate-100 outline-none focus:border-emerald-400"
+              className="mt-2 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-3 text-slate-100 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition"
               name="email"
+              aria-label="Email address"
               value={form.email}
               onChange={updateField}
               type="email"
@@ -81,7 +83,8 @@ export function AuthForm({ mode }) {
           </label>
 
           <button
-            className="w-full rounded-md bg-emerald-500 px-4 py-3 font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+            aria-label={loading ? 'Authenticating' : isRegister ? 'Create account' : 'Sign in'}
+            className="w-full rounded-md bg-emerald-500 px-4 py-3 font-medium text-slate-950 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#111827] disabled:opacity-50 disabled:cursor-not-allowed transition"
             disabled={loading}
             type="submit"
           >
@@ -91,7 +94,10 @@ export function AuthForm({ mode }) {
 
         <p className="mt-6 text-center text-sm text-slate-400">
           {isRegister ? 'Already registered?' : 'Need an account?'}{' '}
-          <Link className="font-medium text-emerald-300 hover:text-emerald-200" to={isRegister ? '/login' : '/register'}>
+          <Link
+            className="font-medium text-emerald-300 hover:text-emerald-200 focus:outline-none focus:underline transition"
+            to={isRegister ? '/login' : '/register'}
+          >
             {isRegister ? 'Login' : 'Register'}
           </Link>
         </p>
