@@ -3,7 +3,7 @@ import { useChatStore } from '../store/chatStore.js';
 import { useSocketStore } from '../store/socketStore.js';
 
 let socket;
-const socketUrl = 'http://localhost:5000';
+const socketUrl = import.meta.env.VITE_SOCKET_URL;
 
 export function getSocket() {
   return socket;
