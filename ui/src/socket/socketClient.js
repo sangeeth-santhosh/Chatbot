@@ -47,7 +47,8 @@ export function disconnectSocket() {
     connected: false,
     connecting: false,
     error: null,
-    typingUsersByRoom: {},
+    typingUsersByChat: {},
+    onlineUsersById: {},
   });
 }
 
@@ -57,16 +58,6 @@ function bindSocketEvents(activeSocket) {
   activeSocket.on('connect', () => {
     socketStore.setConnected(true);
     socketStore.setError(null);
-
-    const chatStore = useChatStore.getState();
-
-    if (chatStore.activeRoomId) {
-      activeSocket.emit('join_chat', { roomId: chatStore.activeRoomId }, (response) => {
-        if (response?.ok) {
-          chatStore.setMessages(chatStore.activeRoomId, response.messages || []);
-        }
-      });
-    }
   });
 
   activeSocket.on('disconnect', () => {
@@ -82,23 +73,31 @@ function bindSocketEvents(activeSocket) {
     useChatStore.getState().setError(new Error(error.message));
   });
 
-  activeSocket.on('chats:update', ({ chats }) => {
+  activeSocket.on('chat_updated', ({ chats }) => {
     useChatStore.getState().setChats(chats);
   });
 
-  activeSocket.on('message:new', ({ message }) => {
+  activeSocket.on('receive_message', ({ message }) => {
     useChatStore.getState().addMessage(message);
   });
 
-  activeSocket.on('typing:start', ({ roomId, user }) => {
-    useSocketStore.getState().addTypingUser(roomId, user);
+  activeSocket.on('typing_start', ({ chatId, user }) => {
+    useSocketStore.getState().addTypingUser(chatId, user);
   });
 
-  activeSocket.on('typing:stop', ({ roomId, userId }) => {
-    useSocketStore.getState().removeTypingUser(roomId, userId);
+  activeSocket.on('typing_stop', ({ chatId, userId }) => {
+    useSocketStore.getState().removeTypingUser(chatId, userId);
   });
 
-  activeSocket.on('participant:left', ({ roomId, userId }) => {
-    useSocketStore.getState().removeTypingUser(roomId, userId);
+  activeSocket.on('user_online', (user) => {
+    useSocketStore.getState().setUserOnline(user);
+  });
+
+  activeSocket.on('user_offline', ({ userId }) => {
+    useSocketStore.getState().setUserOffline(userId);
+    const typingUsersByChat = useSocketStore.getState().typingUsersByChat;
+    Object.keys(typingUsersByChat).forEach((chatId) => {
+      useSocketStore.getState().removeTypingUser(chatId, userId);
+    });
   });
 }

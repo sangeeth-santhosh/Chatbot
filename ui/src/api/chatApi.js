@@ -10,7 +10,17 @@ export async function createChatRequest(payload) {
   return data.chat;
 }
 
-export async function fetchMessagesRequest(roomId) {
-  const { data } = await apiClient.get(`/chats/${roomId}/messages`);
+export async function getChatRequest(chatId) {
+  const { data } = await apiClient.get(`/chats/${chatId}`);
+  return data.chat;
+}
+
+export async function fetchMessagesRequest(chatId) {
+  const { data } = await apiClient.get(`/chats/${chatId}/messages`);
   return data.messages;
+}
+
+export async function markChatReadRequest(chatId) {
+  const { data } = await apiClient.put(`/chats/${chatId}/read`);
+  return data.chat;
 }

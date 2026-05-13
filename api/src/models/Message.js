@@ -2,17 +2,16 @@ import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema(
   {
-    roomId: {
+    chatId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Chat',
       required: true,
       index: true,
     },
-    senderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+    senderRole: {
+      type: String,
+      enum: ['user', 'ai'],
       required: true,
-      index: true,
     },
     text: {
       type: String,
@@ -24,6 +23,6 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-messageSchema.index({ roomId: 1, createdAt: 1 });
+messageSchema.index({ chatId: 1, createdAt: 1 });
 
 export const Message = mongoose.model('Message', messageSchema);

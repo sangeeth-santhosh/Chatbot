@@ -8,42 +8,42 @@ export function Sidebar() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const chats = useChatStore((state) => state.chats);
-  const activeRoomId = useChatStore((state) => state.activeRoomId);
+  const activeChatId = useChatStore((state) => state.activeChatId);
   const loadingChats = useChatStore((state) => state.loadingChats);
   const error = useChatStore((state) => state.error);
   const setError = useChatStore((state) => state.setError);
   const connected = useSocketStore((state) => state.connected);
   const socket = useSocketStore((state) => state.socket);
-  const clearTypingRoom = useSocketStore((state) => state.clearTypingRoom);
-  const setActiveRoom = useChatStore((state) => state.setActiveRoom);
+  const clearTypingChat = useSocketStore((state) => state.clearTypingChat);
+  const onlineUsersById = useSocketStore((state) => state.onlineUsersById);
+  const setActiveChatId = useChatStore((state) => state.setActiveChat);
   const setMessages = useChatStore((state) => state.setMessages);
 
   const selectChat = (chat) => {
-    if (!socket || activeRoomId === chat.id) return;
+    if (!socket || activeChatId === chat.id) return;
 
-    if (activeRoomId) {
-      socket.emit('leave_chat', { roomId: activeRoomId });
-      clearTypingRoom(activeRoomId);
+    if (activeChatId) {
+      clearTypingChat(activeChatId);
     }
 
-    socket.emit('join_chat', { roomId: chat.id }, (response) => {
+    socket.emit('select_chat', { chatId: chat.id }, (response) => {
       if (!response?.ok) {
-        setError(new Error(response?.error || 'Unable to join chat.'));
+        setError(new Error(response?.error || 'Unable to open chat.'));
         return;
       }
 
-      setActiveRoom(chat.id);
+      setActiveChatId(chat.id);
       setMessages(chat.id, response.messages || []);
     });
   };
 
   useEffect(() => {
     return () => {
-      if (socket && activeRoomId) {
-        socket.emit('leave_chat', { roomId: activeRoomId });
+      if (socket && activeChatId) {
+        clearTypingChat(activeChatId);
       }
     };
-  }, [activeRoomId, socket]);
+  }, [activeChatId, socket, clearTypingChat]);
 
   return (
     <aside className="hidden w-80 shrink-0 border-r border-slate-800 bg-[#0f1623] md:flex md:flex-col">
@@ -76,7 +76,7 @@ export function Sidebar() {
       </div>
 
       <div className="flex items-center justify-between px-4 py-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Rooms</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Conversations</h2>
         <span className="text-xs text-slate-500">{chats.length}</span>
       </div>
 
@@ -95,52 +95,58 @@ export function Sidebar() {
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
-        {loadingChats && <p className="px-2 py-3 text-sm text-slate-400">Loading rooms...</p>}
+        {loadingChats && <p className="px-2 py-3 text-sm text-slate-400">Loading conversations...</p>}
 
         {!loadingChats && chats.length === 0 && (
           <p className="px-2 py-3 text-sm leading-6 text-slate-500">
-            No rooms yet. Create one from the prompt input.
+            {user?.role === 'admin'
+              ? 'No user conversations yet.'
+              : 'No conversations yet. Start one from the input above.'}
           </p>
         )}
 
         <div className="space-y-1">
           {chats.map((chat) => {
-            const active = chat.id === activeRoomId;
-            const disabled = chat.status === 'occupied' && !chat.participants.some((item) => item.id === user?.id);
-            const participantsText = chat.participants.map((item) => item.name).join(', ') || 'No participants';
+            const active = chat.id === activeChatId;
+            const isUnread = user?.role === 'admin' ? chat.unreadForAdmin : chat.unreadForUser;
+            const isOnline = Boolean(chat.userId && onlineUsersById[chat.userId]);
+            const title = user?.role === 'admin'
+              ? chat.user?.email || chat.title || 'Untitled'
+              : chat.title || 'Untitled';
+            const subtitle = user?.role === 'admin'
+              ? chat.title || 'New Chat'
+              : chat.lastMessage;
 
             return (
               <button
-                aria-label={`${active ? 'Current room:' : ''} ${chat.prompt}${disabled ? ' (Occupied)' : ''}`}
+                aria-label={`${active ? 'Current chat:' : ''} ${title}${isUnread ? ' (Unread)' : ''}`}
                 className={`w-full rounded-md px-3 py-3 text-left transition focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 focus:ring-offset-[#0f1623] ${
                   active
                     ? 'bg-slate-800 text-white'
-                    : disabled
-                      ? 'text-slate-500 cursor-not-allowed'
-                      : 'text-slate-300 hover:bg-slate-900'
+                    : 'text-slate-300 hover:bg-slate-900'
                 }`}
-                disabled={disabled}
                 key={chat.id}
                 onClick={() => selectChat(chat)}
-                title={chat.prompt}
+                title={title}
                 type="button"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-medium">{chat.prompt}</p>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
-                      chat.status === 'available'
-                        ? 'bg-emerald-500/10 text-emerald-300'
-                        : 'bg-amber-500/10 text-amber-300'
-                    }`}
-                    aria-label={`Status: ${chat.status}`}
-                  >
-                    {chat.status}
+                  <p className="truncate text-sm font-medium">{title}</p>
+                  <span className="flex shrink-0 items-center gap-2">
+                    {isOnline && <span className="h-2 w-2 rounded-full bg-sky-400" aria-label="Online" />}
+                    {isUnread && <span className="h-2 w-2 rounded-full bg-emerald-400" aria-label="Unread" />}
                   </span>
                 </div>
-                <p className="mt-2 truncate text-xs text-slate-500" title={participantsText}>
-                  {participantsText}
-                </p>
+                {subtitle && (
+                  <p className="mt-1 truncate text-xs text-slate-500" title={subtitle}>
+                    {subtitle}
+                  </p>
+                )}
+                {user?.role === 'admin' && chat.lastMessage && (
+                  <p className="mt-1 truncate text-xs text-slate-400" title={chat.lastMessage}>
+                    {chat.lastMessage}
+                  </p>
+                )}
               </button>
             );
           })}

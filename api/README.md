@@ -35,5 +35,6 @@ CLIENT_URL=http://localhost:5173
 - `GET /api/auth/me`
 - `GET /api/chats`
 - `POST /api/chats`
-- `GET /api/chats/:roomId/messages`
-- `POST /api/chats/:roomId/messages`
+- `GET /api/chats/:chatId`
+- `GET /api/chats/:chatId/messages`
+- `PUT /api/chats/:chatId/read`

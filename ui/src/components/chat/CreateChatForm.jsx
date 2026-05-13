@@ -1,30 +1,31 @@
 import { useState } from 'react';
+import { useAuthStore } from '../../store/authStore.js';
 import { useChatStore } from '../../store/chatStore.js';
 import { useSocketStore } from '../../store/socketStore.js';
 
 export function CreateChatForm() {
-  const [prompt, setPrompt] = useState('');
+  const [title, setTitle] = useState('');
+  const user = useAuthStore((state) => state.user);
   const socket = useSocketStore((state) => state.socket);
   const connected = useSocketStore((state) => state.connected);
-  const activeRoomId = useChatStore((state) => state.activeRoomId);
-  const setActiveRoom = useChatStore((state) => state.setActiveRoom);
+  const setActiveChatId = useChatStore((state) => state.setActiveChat);
   const setMessages = useChatStore((state) => state.setMessages);
   const setError = useChatStore((state) => state.setError);
   const [loading, setLoading] = useState(false);
 
+  if (user?.role === 'admin') {
+    return null;
+  }
+
   const submit = (event) => {
     event.preventDefault();
-    const value = prompt.trim();
+    const value = title.trim();
 
     if (!value || !socket) return;
 
     setLoading(true);
 
-    if (activeRoomId) {
-      socket.emit('leave_chat', { roomId: activeRoomId });
-    }
-
-    socket.emit('create_chat', { prompt: value }, (response) => {
+    socket.emit('create_chat', { title: value }, (response) => {
       setLoading(false);
 
       if (!response?.ok) {
@@ -32,8 +33,8 @@ export function CreateChatForm() {
         return;
       }
 
-      setPrompt('');
-      setActiveRoom(response.chat.id);
+      setTitle('');
+      setActiveChatId(response.chat.id);
       setMessages(response.chat.id, []);
     });
   };
@@ -42,21 +43,21 @@ export function CreateChatForm() {
     <form className="border-b border-slate-800 bg-[#0b0f19] p-4" onSubmit={submit}>
       <div className="mx-auto flex max-w-4xl flex-col gap-3 sm:flex-row">
         <input
-          aria-label="Chat room prompt"
+          aria-label="Chat title"
           className="min-h-11 flex-1 rounded-md border border-slate-700 bg-[#111827] px-4 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!connected || loading}
-          maxLength={500}
-          onChange={(event) => setPrompt(event.target.value)}
-          placeholder="Create a chat room prompt..."
-          value={prompt}
+          maxLength={100}
+          onChange={(event) => setTitle(event.target.value)}
+          placeholder="Start a new conversation..."
+          value={title}
         />
         <button
-          aria-label={loading ? 'Creating room' : 'Create room'}
+          aria-label={loading ? 'Creating chat' : 'New chat'}
           className="h-11 rounded-md bg-emerald-500 px-5 text-sm font-medium text-slate-950 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#0b0f19] disabled:opacity-50 disabled:cursor-not-allowed transition"
-          disabled={!connected || loading || !prompt.trim()}
+          disabled={!connected || loading || !title.trim()}
           type="submit"
         >
-          {loading ? 'Creating...' : 'Create'}
+          {loading ? 'Creating...' : 'New Chat'}
         </button>
       </div>
     </form>

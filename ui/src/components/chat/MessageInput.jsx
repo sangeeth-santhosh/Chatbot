@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Mic, Paperclip, Sparkles, Send } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore.js';
 import { useSocketStore } from '../../store/socketStore.js';
 
@@ -9,18 +10,18 @@ export function MessageInput({ chat }) {
   const setError = useChatStore((state) => state.setError);
   const typingTimer = useRef(null);
 
-  const stopTyping = () => {
+  const stopTyping = useCallback(() => {
     if (socket && chat) {
-      socket.emit('typing_stop', { roomId: chat.id });
+      socket.emit('typing_stop', { chatId: chat.id });
     }
-  };
+  }, [chat, socket]);
 
   const updateText = (event) => {
     setText(event.target.value);
 
     if (!socket || !chat) return;
 
-    socket.emit('typing_start', { roomId: chat.id });
+    socket.emit('typing_start', { chatId: chat.id });
     window.clearTimeout(typingTimer.current);
     typingTimer.current = window.setTimeout(stopTyping, 900);
   };
@@ -31,7 +32,7 @@ export function MessageInput({ chat }) {
 
     if (!value || !socket || !chat) return;
 
-    socket.emit('send_message', { roomId: chat.id, text: value }, (response) => {
+    socket.emit('send_message', { chatId: chat.id, text: value }, (response) => {
       if (!response?.ok) {
         setError(new Error(response?.error || 'Unable to send message.'));
       }
@@ -46,14 +47,17 @@ export function MessageInput({ chat }) {
       window.clearTimeout(typingTimer.current);
       stopTyping();
     };
-  }, []);
+  }, [stopTyping]);
 
   return (
-    <form className="border-t border-slate-800 bg-[#0b0f19] p-4" onSubmit={submit}>
-      <div className="mx-auto flex max-w-4xl gap-3">
+    <div className="sticky bottom-0 z-10 border-t border-slate-800 bg-[#0b0f19] p-4">
+      <form
+        className="mx-auto flex max-w-4xl flex-col gap-3 rounded-[28px] border border-slate-700 bg-white/5 px-4 py-4 shadow-black/20 backdrop-blur-xl transition"
+        onSubmit={submit}
+      >
         <textarea
           aria-label="Message input"
-          className="max-h-36 min-h-12 flex-1 resize-none rounded-md border border-slate-700 bg-[#111827] px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="min-h-[96px] w-full resize-none rounded-[28px] border border-slate-700 bg-[#111827] px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!chat || !connected}
           maxLength={2000}
           onChange={updateText}
@@ -62,19 +66,48 @@ export function MessageInput({ chat }) {
               submit(event);
             }
           }}
-          placeholder={chat ? 'Send a message...' : 'Choose a room to chat'}
-          rows={1}
+          placeholder={chat ? 'Ask anything' : 'Select a conversation to chat'}
+          rows={2}
           value={text}
         />
-        <button
-          aria-label="Send message"
-          className="h-12 rounded-md bg-slate-100 px-5 text-sm font-medium text-slate-950 hover:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#0b0f19] disabled:opacity-50 disabled:cursor-not-allowed transition"
-          disabled={!chat || !connected || !text.trim()}
-          type="submit"
-        >
-          Send
-        </button>
-      </div>
-    </form>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2 text-slate-400">
+            <button
+              aria-label="Add attachment"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900/80 text-slate-200 transition hover:bg-slate-800"
+              type="button"
+            >
+              <Paperclip className="h-4 w-4" />
+            </button>
+            <button
+              aria-label="Tools"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900/80 text-slate-200 transition hover:bg-slate-800"
+              type="button"
+            >
+              <Sparkles className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              aria-label="Voice input"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900/80 text-slate-200 transition hover:bg-slate-800"
+              type="button"
+            >
+              <Mic className="h-4 w-4" />
+            </button>
+            <button
+              aria-label="Send message"
+              className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-500 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!chat || !connected || !text.trim()}
+              type="submit"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }

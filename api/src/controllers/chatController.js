@@ -1,38 +1,41 @@
 import {
   createChat,
-  createMessage,
+  getAdminChats,
+  getChatById,
   getMessages,
-  listChats,
+  getUserChats,
+  markChatAsRead,
 } from '../services/chatService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const createChatController = asyncHandler(async (req, res) => {
   const chat = await createChat(req.user._id, req.body);
-  const io = req.app.get('io');
-
-  if (io) {
-    io.emit('chats:update', { chats: await listChats() });
-  }
-
   res.status(201).json({ chat });
 });
 
-export const getChatsController = asyncHandler(async (_req, res) => {
-  res.json({ chats: await listChats() });
+export const listChatsController = asyncHandler(async (req, res) => {
+  let chats;
+
+  if (req.user.role === 'admin') {
+    chats = await getAdminChats();
+  } else {
+    chats = await getUserChats(req.user._id);
+  }
+
+  res.json({ chats });
+});
+
+export const getChatController = asyncHandler(async (req, res) => {
+  const chat = await getChatById(req.params.chatId, req.user);
+  res.json({ chat });
 });
 
 export const getMessagesController = asyncHandler(async (req, res) => {
-  res.json({ messages: await getMessages(req.params.roomId) });
+  const messages = await getMessages(req.params.chatId, req.user);
+  res.json({ messages });
 });
 
-export const createMessageController = asyncHandler(async (req, res) => {
-  const message = await createMessage(req.params.roomId, req.user._id, req.body);
-  const io = req.app.get('io');
-
-  if (io) {
-    io.to(req.params.roomId).emit('message:new', { message });
-    io.emit('chats:update', { chats: await listChats() });
-  }
-
-  res.status(201).json({ message });
+export const markChatReadController = asyncHandler(async (req, res) => {
+  const chat = await markChatAsRead(req.params.chatId, req.user);
+  res.json({ chat });
 });

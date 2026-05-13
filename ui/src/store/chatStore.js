@@ -3,15 +3,15 @@ import { fetchChatsRequest, fetchMessagesRequest } from '../api/chatApi.js';
 
 export const useChatStore = create((set, get) => ({
   chats: [],
-  activeRoomId: null,
-  messagesByRoom: {},
+  activeChatId: null,
+  messagesByChat: {},
   loadingChats: false,
   loadingMessages: false,
   error: null,
 
   setChats: (chats) => set({ chats }),
 
-  setActiveRoom: (roomId) => set({ activeRoomId: roomId }),
+  setActiveChat: (chatId) => set({ activeChatId: chatId }),
 
   setError: (error) => set({ error }),
 
@@ -26,13 +26,13 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  fetchMessages: async (roomId) => {
+  fetchMessages: async (chatId) => {
     set({ loadingMessages: true, error: null });
 
     try {
-      const messages = await fetchMessagesRequest(roomId);
+      const messages = await fetchMessagesRequest(chatId);
       set((state) => ({
-        messagesByRoom: { ...state.messagesByRoom, [roomId]: messages },
+        messagesByChat: { ...state.messagesByChat, [chatId]: messages },
         loadingMessages: false,
       }));
     } catch (error) {
@@ -40,28 +40,28 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  setMessages: (roomId, messages) => {
+  setMessages: (chatId, messages) => {
     set((state) => ({
-      messagesByRoom: { ...state.messagesByRoom, [roomId]: messages },
+      messagesByChat: { ...state.messagesByChat, [chatId]: messages },
     }));
   },
 
   addMessage: (message) => {
     set((state) => {
-      const roomMessages = state.messagesByRoom[message.roomId] || [];
+      const chatMessages = state.messagesByChat[message.chatId] || [];
 
-      if (roomMessages.some((item) => item.id === message.id)) {
+      if (chatMessages.some((item) => item.id === message.id)) {
         return state;
       }
 
       return {
-        messagesByRoom: {
-          ...state.messagesByRoom,
-          [message.roomId]: [...roomMessages, message],
+        messagesByChat: {
+          ...state.messagesByChat,
+          [message.chatId]: [...chatMessages, message],
         },
       };
     });
   },
 
-  activeChat: () => get().chats.find((chat) => chat.id === get().activeRoomId) || null,
+  activeChat: () => get().chats.find((chat) => chat.id === get().activeChatId) || null,
 }));

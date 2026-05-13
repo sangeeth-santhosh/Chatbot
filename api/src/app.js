@@ -13,9 +13,18 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(helmet());
+const allowedOrigins = [env.clientUrl, 'http://localhost:5174'];
+
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   }),
 );

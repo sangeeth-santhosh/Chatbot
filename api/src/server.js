@@ -2,6 +2,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import app from './app.js';
 import { connectDatabase } from './config/db.js';
+import { seedDatabase } from './config/seed.js';
 import env from './config/env.js';
 import { socketAuth } from './socket/authSocket.js';
 import { registerChatSocket } from './socket/chatSocket.js';
@@ -20,6 +21,7 @@ app.set('io', io);
 
 async function start() {
   await connectDatabase();
+  await seedDatabase();
 
   server.listen(env.port, () => {
     console.log(`API listening on http://localhost:${env.port}`);

@@ -20,7 +20,6 @@ export function socketAuth(socket, next) {
         }
 
         socket.data.user = user;
-        socket.data.activeRooms = new Set();
         next();
       })
       .catch(next);
