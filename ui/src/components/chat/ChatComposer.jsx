@@ -10,6 +10,7 @@ const ChatComposer = () => {
   const activeChatId = useChatStore((state) => state.activeChatId);
   const setActiveChat = useChatStore((state) => state.setActiveChat);
   const setMessages = useChatStore((state) => state.setMessages);
+  const addMessage = useChatStore((state) => state.addMessage);
   const setError = useChatStore((state) => state.setError);
   const socket = useSocketStore((state) => state.socket);
   const connected = useSocketStore((state) => state.connected);
@@ -25,6 +26,11 @@ const ChatComposer = () => {
     socket.emit('send_message', { chatId, text: value }, (response) => {
       if (!response?.ok) {
         setError(new Error(response?.error || 'Unable to send message.'));
+        return;
+      }
+
+      if (response.message) {
+        addMessage(response.message);
       }
     });
   };

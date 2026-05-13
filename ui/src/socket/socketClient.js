@@ -3,7 +3,7 @@ import { useChatStore } from '../store/chatStore.js';
 import { useSocketStore } from '../store/socketStore.js';
 
 let socket;
-const socketUrl = import.meta.env.VITE_SOCKET_URL;
+const socketUrl = import.meta.env?.VITE_SOCKET_URL || 'http://localhost:5000';
 
 export function getSocket() {
   return socket;
@@ -58,6 +58,7 @@ function bindSocketEvents(activeSocket) {
   activeSocket.on('connect', () => {
     socketStore.setConnected(true);
     socketStore.setError(null);
+    syncActiveChat(activeSocket);
   });
 
   activeSocket.on('disconnect', () => {
@@ -99,5 +100,23 @@ function bindSocketEvents(activeSocket) {
     Object.keys(typingUsersByChat).forEach((chatId) => {
       useSocketStore.getState().removeTypingUser(chatId, userId);
     });
+  });
+}
+
+function syncActiveChat(activeSocket) {
+  const chatStore = useChatStore.getState();
+  const activeChatId = chatStore.activeChatId;
+
+  if (!activeChatId) return;
+
+  activeSocket.emit('select_chat', { chatId: activeChatId }, (response) => {
+    if (activeSocket !== socket) return;
+
+    if (!response?.ok) {
+      chatStore.setError(new Error(response?.error || 'Unable to reconnect conversation.'));
+      return;
+    }
+
+    useChatStore.getState().setMessages(activeChatId, response.messages || []);
   });
 }

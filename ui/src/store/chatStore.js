@@ -9,7 +9,7 @@ export const useChatStore = create((set, get) => ({
   loadingMessages: false,
   error: null,
 
-  setChats: (chats) => set({ chats }),
+  setChats: (chats) => set({ chats: Array.isArray(chats) ? chats : [] }),
 
   setActiveChat: (chatId) => set({ activeChatId: chatId }),
 
@@ -49,15 +49,30 @@ export const useChatStore = create((set, get) => ({
   addMessage: (message) => {
     set((state) => {
       const chatMessages = state.messagesByChat[message.chatId] || [];
-
-      if (chatMessages.some((item) => item.id === message.id)) {
-        return state;
-      }
+      const hasMessage = chatMessages.some((item) => item.id === message.id);
+      const isActiveChat = state.activeChatId === message.chatId;
 
       return {
+        chats: state.chats.map((chat) => {
+          if (chat.id !== message.chatId) {
+            return chat;
+          }
+
+          return {
+            ...chat,
+            lastMessage: message.text,
+            unreadForAdmin: isActiveChat
+              ? false
+              : message.senderRole === 'user' || chat.unreadForAdmin,
+            unreadForUser: isActiveChat
+              ? false
+              : message.senderRole === 'ai' || chat.unreadForUser,
+            updatedAt: message.createdAt || chat.updatedAt,
+          };
+        }),
         messagesByChat: {
           ...state.messagesByChat,
-          [message.chatId]: [...chatMessages, message],
+          [message.chatId]: hasMessage ? chatMessages : [...chatMessages, message],
         },
       };
     });
