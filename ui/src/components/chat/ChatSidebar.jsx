@@ -5,7 +5,7 @@ import { useChatStore } from '../../store/chatStore.js';
 import { useSocketStore } from '../../store/socketStore.js';
 import { getErrorMessage } from '../../utils/errors.js';
 
-const ChatSidebar = () => {
+const ChatSidebar = ({ onSelect }) => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const chats = useChatStore((state) => state.chats);
@@ -35,6 +35,7 @@ const ChatSidebar = () => {
 
       setActiveChat(chat.id);
       setMessages(chat.id, response.messages || []);
+      onSelect?.();
     });
   };
 
@@ -43,10 +44,11 @@ const ChatSidebar = () => {
       clearTypingChat(activeChatId);
     }
     setActiveChat(null);
+    onSelect?.();
   };
 
   return (
-    <aside className="flex h-auto max-h-[42vh] w-full shrink-0 flex-col border-b border-[#2f2f2f] bg-[#171717] md:h-screen md:max-h-none md:w-[260px] md:border-b-0 md:border-r">
+    <aside className="flex h-full w-full shrink-0 flex-col border-r border-[#2f2f2f] bg-[#171717] md:h-screen md:w-[260px]">
       <div className="flex items-center justify-between gap-3 border-b border-[#2f2f2f] p-3">
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold text-white">
